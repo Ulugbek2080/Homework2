@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NotDondExceptTest {
+public class ShopRepositoryTest {
 
     @Test
     void removeProduct() {
@@ -22,9 +22,32 @@ public class NotDondExceptTest {
         ShopRepository shop = new ShopRepository();
         shop.add(new Product(0, "0", 0));
 
-        NotFoundException.removeById(shop, 1);
+        assertThrows(NotFoundException.class,
+                () -> shop.remove(1));
+    }
+
+    @Test
+    void addTwoProducts() {
+        ShopRepository shop = new ShopRepository();
+
+        shop.add(new Product(1, "A", 10));
+        shop.add(new Product(2, "B", 20));
+
+        assertEquals(2, shop.findAll().length);
+        assertEquals(2, shop.findAll()[1].getId());
+    }
+
+    @Test
+    void removeFirstProduct() {
+        ShopRepository shop = new ShopRepository();
+
+        shop.add(new Product(1, "A", 10));
+        shop.add(new Product(2, "B", 20));
+
+        shop.remove(1);
 
         assertEquals(1, shop.findAll().length);
+        assertEquals(2, shop.findAll()[0].getId());
     }
 
     @Test
@@ -78,80 +101,41 @@ public class NotDondExceptTest {
     }
 
     @Test
-    void findById() {
-        Product product = new Product(1, "A", 10);
-        Product[] products = {product};
-
-        assertEquals(product, NotFoundException.findById(products, 1));
-    }
-
-    @Test
-    void findByIdNotFound() {
-        Product[] products = {
-                new Product(1, "A", 10)
-        };
-
-        assertNull(NotFoundException.findById(products, 2));
-    }
-
-
-    @Test
     void equalsFalse() {
         Product p1 = new Product(1, "A", 10);
         Product p2 = new Product(2, "B", 20);
 
-        assertFalse(p1.equals(p2));
+        assertNotEquals(p1, p2);
     }
 
     @Test
-    void findByIdFound() {
-        Product product = new Product(1, "A", 10);
+    void exceptionMessage() {
+        NotFoundException exception =
+                new NotFoundException("Element with id: 1 not found");
 
-        assertEquals(product,
-                NotFoundException.findById(new Product[]{product}, 1));
+        assertEquals("Element with id: 1 not found",
+                exception.getMessage());
     }
 
     @Test
-    void removeByIdFound() {
-        ShopRepository shop = new ShopRepository();
-        shop.add(new Product(1, "A", 10));
+    void falseWhenNull() {
+        assertEquals(false, equals(null));
+    }
 
-        NotFoundException.removeById(shop, 1);
-
-        assertEquals(0, shop.findAll().length);
+    void falseWhenType() {
+        assertEquals(false, equals("A"));
+    }
+    @Test
+    void equalsNotProduct() {
+        Product p1 = new Product(1, "A", 10);
+        Product p2 = new Product(1, "A", 12);
+        assertEquals(false, p1.equals(p2));
     }
 
     @Test
-    void removeByIdNotFound() {
-        ShopRepository shop = new ShopRepository();
-        shop.add(new Product(1, "A", 10));
-
-        NotFoundException.removeById(shop, 2);
-
-        assertEquals(1, shop.findAll().length);
-    }
-
-    @Test
-    void addTwoProducts() {
-        ShopRepository shop = new ShopRepository();
-
-        shop.add(new Product(1, "A", 10));
-        shop.add(new Product(2, "B", 20));
-
-        assertEquals(2, shop.findAll().length);
-        assertEquals(2, shop.findAll()[1].getId());
-    }
-
-    @Test
-    void removeFirstProduct() {
-        ShopRepository shop = new ShopRepository();
-
-        shop.add(new Product(1, "A", 10));
-        shop.add(new Product(2, "B", 20));
-
-        shop.remove(1);
-
-        assertEquals(1, shop.findAll().length);
-        assertEquals(2, shop.findAll()[0].getId());
+    void equalsProduct() {
+        Product p1 = new Product(1, "A", 10);
+        Product p2 = new Product(1, "A", 10);
+        assertEquals(true, p1.equals(p2));
     }
 }
